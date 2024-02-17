@@ -1,0 +1,172 @@
+1)Write a program that computes the perimeter and the area of a rectangle. Define
+your own values for the length and width. (Assuming that L and W are the length
+and width of the rectangle, Perimeter = 2*(L+W) and Area = L*W. Display the
+output on the screen using dbms_output.put_line.
+
+Wrote file afiedt.buf
+
+  1  create or replace procedure mylength(l number,w number)
+  2  as
+  3  peri number;
+  4  area number;
+  5  begin
+  6     peri:=2*(l+w);
+  7     area:=l*w;
+  8     DBMS_OUTPUT.PUT_LINE('PERIMETER OF RECTANGLE : '||peri);
+  9     DBMS_OUTPUT.PUT_LINE('AREA OF RECTANGLE : '||area);
+ 10* end;
+SQL> /
+
+Procedure created.
+SQL> exec mylength(5,5)
+PERIMETER OF RECTANGLE : 20
+AREA OF RECTANGLE : 25
+
+PL/SQL procedure successfully completed.
+------------------------------------------------------------------------------------------------------------------
+2)Write a program that declares an integer variable called num, assigns a value to it,
+and computes and inserts into the tempp table the value of the variable itself, its
+square, and its cube.
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create table sqcut(
+  2  var number,
+  3  square number,
+  4  cube number
+  5* )
+SQL> /
+
+Table created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1   create or replace procedure sqcu(n number)
+  2   as
+  3   sq number;
+  4   cu number;
+  5   begin
+  6      sq:=n*n;
+  7      cu:=n*n*n;
+  8     insert into sqcut(var,square,cube) values(n,sq,cu);
+  9*     end;
+ 10
+ 11
+ 12  .
+SQL> /
+
+Procedure created.
+
+SQL> exec sqcu(5)
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from sqcut;
+
+       VAR     SQUARE       CUBE
+---------- ---------- ----------
+         5         25        125
+
+------------------------------------------------------------------------------------------------------------------
+
+3)Convert a temperature in Fahrenheit (F) to its equivalent in Celsius (C) and vice
+versa. The required formulae are:-
+C= (F-32)*5/9
+F= 9/5*C + 32
+Display the output on the screen using dbms_output.put_line. Data has to be
+input by the user.
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure fahcel(n number,conv varchar2)
+  2  as
+  3  c number;
+  4  begin
+  5     if conv='F'
+  6             then
+  7                     c:=(n-32)*(5/9);
+  8                     DBMS_OUTPUT.PUT_LINE('Fahrenheit to Celsius conversion : '||c);
+  9     else
+ 10             c:=(9/5)*n + 32;
+ 11             DBMS_OUTPUT.PUT_LINE('Celsius to Fahrenheit conversion : '||c);
+ 12     end if;
+ 13* end;
+SQL> /
+
+Procedure created.
+
+SQL> exec fahcel(29,'C')
+Celsius to Fahrenheit conversion : 84.2
+
+PL/SQL procedure successfully completed.
+
+SQL> exec fahcel(84.2,'F')
+Fahrenheit to Celsius conversion : 29
+------------------------------------------------------------------------------------------------------------------
+4)Convert a number of inches into yards, feet, and inches. For example, 124 inches
+equals 3 yards, 1 foot, and 4 inches. Display the output on the screen using
+dbms_output.put_line. Data has to be input by the user.
+
+
+  1  declare
+  2  inch number :=&inch;
+  3  yard number;
+  4  foot number;
+  5  begin
+  6     yard:=trunc(inch/36,2);
+  7     DBMS_OUTPUT.PUT_LINE('INCHES TO YARD : '||yard);
+  8     foot:=trunc(inch/12,2);
+  9     DBMS_OUTPUT.PUT_LINE('INCHES TO FEET : '||foot);
+ 10     DBMS_OUTPUT.PUT_LINE('INCHES : '||inch);
+ 11* end;
+SQL> /
+Enter value for inch: 124
+old   2: inch number :=&inch;
+new   2: inch number :=124;             
+INCHES TO YARD : 3.44
+INCHES TO FEET : 10.33
+INCHES : 124
+------------------------------------------------------------------------------------------------------------------
+5)
+create or replace procedure divi(n varchar2)
+    as
+     da varchar2(20);
+     a varchar(20);
+    begin
+       select * into da from dual where REGEXP_LIKE(n,'[50]$');
+       if da='X' then
+               DBMS_OUTPUT.PUT_LINE('DIVISIBLE BY 5');
+      end if;
+EXCEPTION
+WHEN OTHERS THEN
+ DBMS_OUTPUT.PUT_LINE('NOT DIVISIBLE BY 5');
+ end;
+/
+------------------------------------------------------------------------------------------------------------------
+6) Your block should read in two real numbers and tell whether the product of the
+two numbers is equal to or greater than 100. Display the output on the screen
+using dbms_output.put_line. (Use decode instead of IF statement where
+required). Data has to be input by the user.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure prod(n1 number,n2 number)
+  2  as
+  3  ans number;
+  4  begin
+  5  ans:=n1*n2;
+  6  if ans>=100 then
+  7  DBMS_OUTPUT.PUT_LINE('product greater than 100');
+  8  else
+  9  DBMS_OUTPUT.PUT_LINE('product not greater than 100');
+ 10  end if;
+ 11* end;
+SQL> /
+
+Procedure created.

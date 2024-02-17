@@ -1,0 +1,480 @@
+1. Write a procedure for the following.
+a. To accept employee number , delete the record of the given
+employee.
+
+SQL> set autocommit off;
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure del_rec(eno in number)
+  2  as
+  3     begin
+  4             delete from emp where empno=eno;
+  5*    end;
+SQL> /
+
+Procedure created.
+
+SQL> execute del_rec(7900);
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from emp;
+
+     EMPNO ENAME      JOB                       MGR HIREDATE         SAL       COMM     DEPTNO     NETSAL
+---------- ---------- ------------------ ---------- --------- ---------- ---------- ---------- ----------
+      7369 SMITH      SENIOR CLERK             7902 17-DEC-80        800                    20       1000
+      7521 WARD       SALESMAN                 7698 22-FEB-81       1250        500         30       1000
+      7654 MARTIN     SALESMAN                 7698 28-SEP-81       1250       1400         30       1000
+      7566 JONES      MANAGER                  7839 02-APR-81       2975                    20       1000
+      7698 BLAKE      MANAGER                  7839 01-MAY-81       2850                    30       1000
+      7844 TURNER     SALESMAN                 7698 08-SEP-81       1500          0         30       1000
+      7782 CLARK      MANAGER                  7777 09-JUN-81     2817.5                    10       1000
+      7788 SCOTT      ANALYST                  7566 09-DEC-82       3000                    20       1000
+      7839 KING       MANAGER                  7777 17-NOV-81       5750                    10       1000
+      7876 ADAMS      CLERK                    7788 12-JAN-83       1100                    20       1000
+      7902 FORD       ANALYST                  7566 03-DEC-81       3000                    20       1000
+      7934 MILLER     MANAGER                  7777 23-JAN-82       1495                    10       1000
+      7499 ALLEN      SALESMAN                 7698 20-FEB-81       1495        300         30       1000
+
+13 rows selected.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from emp;
+
+     EMPNO ENAME      JOB                       MGR HIREDATE         SAL       COMM     DEPTNO     NETSAL
+---------- ---------- ------------------ ---------- --------- ---------- ---------- ---------- ----------
+      7369 SMITH      SENIOR CLERK             7902 17-DEC-80        800                    20       1000
+      7521 WARD       SALESMAN                 7698 22-FEB-81       1250        500         30       1000
+      7654 MARTIN     SALESMAN                 7698 28-SEP-81       1250       1400         30       1000
+      7566 JONES      MANAGER                  7839 02-APR-81       2975                    20       1000
+      7698 BLAKE      MANAGER                  7839 01-MAY-81       2850                    30       1000
+      7844 TURNER     SALESMAN                 7698 08-SEP-81       1500          0         30       1000
+      7782 CLARK      MANAGER                  7777 09-JUN-81     2817.5                    10       1000
+      7788 SCOTT      ANALYST                  7566 09-DEC-82       3000                    20       1000
+      7839 KING       MANAGER                  7777 17-NOV-81       5750                    10       1000
+      7900 JAMES      CLERK                    7698 03-DEC-81        950                    30       1000
+      7876 ADAMS      CLERK                    7788 12-JAN-83       1100                    20       1000
+      7902 FORD       ANALYST                  7566 03-DEC-81       3000                    20       1000
+      7934 MILLER     MANAGER                  7777 23-JAN-82       1495                    10       1000
+      7499 ALLEN      SALESMAN                 7698 20-FEB-81       1495        300         30       1000
+
+14 rows selected.
+
+
+
+b. To accept grade,losal and hisal and insert a record into
+salgrad table
+
+
+SQL> select * from salgrade;
+
+     GRADE      LOSAL      HISAL
+---------- ---------- ----------
+         1        700       1200
+         2       1201       1400
+         3       1401       2000
+         4       2001       3000
+         5       3001       9999
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure add_grd(g in number , lsal in number , hsal in number)
+  2  as
+  3     begin
+  4             insert into salgrade values(g,lsal,hsal);
+  5*    end;
+SQL> /
+
+Procedure created.
+
+SQL> execute add_grd(6,3008,10000);
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from salgrade;
+
+     GRADE      LOSAL      HISAL
+---------- ---------- ----------
+         1        700       1200
+         2       1201       1400
+         3       1401       2000
+         4       2001       3000
+         5       3001       9999
+         6       3008      10000
+
+6 rows selected.
+--------------------------------------------------------------------------------------------
+2. Write functions to perform the following.
+a. Calculate experience of the employee
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace function cal_exp1(date1 date)
+  2  return number
+  3  as
+  4     begin
+  5             return  floor(months_between(sysdate,date1)/12) ;
+  6*    end;
+SQL> /
+
+
+SQL> select empno , ename, hiredate,concat(cal_exp1(hiredate),' Years')  Exp from emp;
+
+     EMPNO ENAME      HIREDATE  EXP
+---------- ---------- --------- ----------------------------------------------
+      7369 SMITH      17-DEC-80 42 Years
+      7521 WARD       22-FEB-81 42 Years
+      7654 MARTIN     28-SEP-81 42 Years
+      7566 JONES      02-APR-81 42 Years
+      7698 BLAKE      01-MAY-81 42 Years
+      7844 TURNER     08-SEP-81 42 Years
+      7782 CLARK      09-JUN-81 42 Years
+      7788 SCOTT      09-DEC-82 40 Years
+      7839 KING       17-NOV-81 41 Years
+      7900 JAMES      03-DEC-81 41 Years
+      7876 ADAMS      12-JAN-83 40 Years
+      7902 FORD       03-DEC-81 41 Years
+      7934 MILLER     23-JAN-82 41 Years
+      7499 ALLEN      20-FEB-81 42 Years
+
+14 rows selected.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+b. Ti calculate net sal by using formula.
+Netsal=sal+da+hra-pf+comm
+Da-→ 10% sal hra→ 15% sal pf --→ 8 % of sal
+
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace function net_sal1(salary in number,com in number)
+  2  return number
+  3  as
+  4     begin
+  5     return salary+0.1*salary+0.15*salary-0.08*salary+nvl(com,0);
+  6*    end;
+SQL> /
+
+Function created.
+ select empno,ename,job,hiredate,sal,net_sal1(sal,comm) net_salary from emp;
+
+     EMPNO ENAME      JOB                HIREDATE         SAL NET_SALARY
+---------- ---------- ------------------ --------- ---------- ----------
+      7369 SMITH      SENIOR CLERK       17-DEC-80        800        936
+      7521 WARD       SALESMAN           22-FEB-81       1250     1962.5
+      7654 MARTIN     SALESMAN           28-SEP-81       1250     2862.5
+      7566 JONES      MANAGER            02-APR-81       2975    3480.75
+      7698 BLAKE      MANAGER            01-MAY-81       2850     3334.5
+      7844 TURNER     SALESMAN           08-SEP-81       1500       1755
+      7782 CLARK      MANAGER            09-JUN-81     2817.5   3296.475
+      7788 SCOTT      ANALYST            09-DEC-82       3000       3510
+      7839 KING       MANAGER            17-NOV-81       5750     6727.5
+      7900 JAMES      CLERK              03-DEC-81        950     1111.5
+      7876 ADAMS      CLERK              12-JAN-83       1100       1287
+      7902 FORD       ANALYST            03-DEC-81       3000       3510
+      7934 MILLER     MANAGER            23-JAN-82       1495    1749.15
+      7499 ALLEN      SALESMAN           20-FEB-81       1495    2049.15
+
+14 rows selected.
+
+
+
+Q2
+1)
+Wrote file afiedt.buf
+
+  1  create or replace procedure formyloop
+  2  as
+  3  k number :=&k;
+  4  i number;
+  5  j number;
+  6  begin
+  7     for i in 1..k
+  8     loop
+  9             for j in 1..i
+ 10             loop
+ 11                     DBMS_OUTPUT.PUT('*');
+ 12             end loop;
+ 13     DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+
+SQL> /
+Enter value for k: 6
+old   3: k number :=&k;
+new   3: k number :=6;
+
+
+SQL> exec formyloop
+*
+**
+***
+****
+*****
+******
+2)
+ 
+  1  create or replace procedure display(n number)
+  2  as
+  3   str varchar2(10):='';
+  4   c number :=2;
+  5   s number;
+  6  begin
+  7      s:=floor(n/2);
+  8     loop
+  9             str:=lpad(' ',c,'*');
+ 10             str:=concat(lpad(' ',s,' '),str);
+ 11             DBMS_OUTPUT.PUT_LINE(str);
+ 12             c:=c+2;
+ 13             s:=s-1;
+ 14             exit when c>n+1;
+ 15     end loop;
+ 16     c:=n-1;
+ 17     s:=1;
+ 18     loop
+ 19             str:=lpad(' ',c,'*');
+ 20             str:=concat(lpad(' ',s,' '),str);
+ 21             DBMS_OUTPUT.PUT_LINE(str);
+ 22             c:=c-2;
+ 23             s:=s+1;
+ 24             exit when c<2;
+ 25     end loop;
+ 26* end;
+SQL> /
+
+Procedure created.
+
+SQL> exec display(7);
+   *
+  ***
+ *****
+*******
+ *****
+  ***
+   *
+
+set serveroutput on format truncated
+3)
+  1  create or replace procedure loop1(n number)
+  2  as
+  3   str varchar2(20):='';
+  4   c number:=5;
+  5   s number :=1;
+  6  begin
+  7      loop
+  8                str:=lpad('1',c,'10');
+  9               str:=concat(lpad(' ',s,' '),str);
+ 10               DBMS_OUTPUT.PUT_LINE(str);
+ 11                exit when c<2;
+ 12              c:=c-2;
+ 13                s:=s+1;
+ 14        end loop;
+ 15* end;
+SQL> /
+
+Procedure created.
+
+SQL> exec loop1(5)
+ 10101
+  101
+   1
+
+4)
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure formyloop
+  2  as
+  3  k number :=&k;
+  4  i number;
+  5  j number;
+  6  begin
+  7     for i in 1..k
+  8     loop
+  9             for j in 1..i
+ 10             loop
+ 11                     DBMS_OUTPUT.PUT(j);
+ 12             end loop;
+ 13     DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for k: 5
+old   3: k number :=&k;
+new   3: k number :=5;
+
+Procedure created.
+
+SQL> exec formyloop
+1
+12
+123
+1234
+12345
+
+PL/SQL procedure successfully completed.
+
+
+
+
+------------------------REVERSE----------------------------
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure formyloop
+  2  as
+  3  k number :=&k;
+  4  i number;
+  5  j number;
+  6  begin
+  7     for i in reverse 1..k
+  8     loop
+  9             for j in reverse 1..i
+ 10             loop
+ 11                     DBMS_OUTPUT.PUT(j);
+ 12             end loop;
+ 13     DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for k: 5
+old   3: k number :=&k;
+new   3: k number :=5;
+
+Procedure created.
+
+SQL> exec formyloop
+54321
+4321
+321
+21
+1
+
+PL/SQL procedure successfully completed.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create or replace procedure formyloop
+  2  as
+  3  k number :=&k;
+  4  i number;
+  5  j number;
+  6  begin
+  7     for i in reverse 1..k
+  8     loop
+  9             for j in reverse 1..i
+ 10             loop
+ 11                     DBMS_OUTPUT.PUT('*');
+ 12             end loop;
+ 13     DBMS_OUTPUT.NEW_LINE;
+ 14  end loop;
+ 15* end;
+SQL> /
+Enter value for k: 5
+old   3: k number :=&k;
+new   3: k number :=5;
+
+Procedure created.
+
+SQL> exec formyloop
+*****
+****
+***
+**
+*
+
+PL/SQL procedure successfully completed.
+
+3)
+Write trigger on employee table for insert, update and delete, make
+appropriate entries in following table.
+Create table emp_check(
+Empid number;
+Ename varchar2(20),
+Oldsal number(9,2),
+Newsal number(9,2),
+Uname varchar2(20),
+Chk_date date);
+
+ Create table emp_check(
+  2  Empid number,
+  3  Ename varchar2(20),
+  4  Oldsal number(9,2),
+  5  Newsal number(9,2),
+  6  Uname varchar2(20),
+  7* Chk_date date)
+SQL> /
+
+Table created.
+
+SQL> desc table
+ERROR:
+ORA-00931: missing identifier
+
+
+SQL> desc emp_check
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMPID                                              NUMBER
+ ENAME                                              VARCHAR2(20)
+ OLDSAL                                             NUMBER(9,2)
+ NEWSAL                                             NUMBER(9,2)
+ UNAME                                              VARCHAR2(20)
+ CHK_DATE                                           DATE
+
+
+ ed
+Wrote file afiedt.buf
+
+  1  create or replace trigger empchk
+  2  after insert or delete or update on emp
+  3  for each row
+  4  begin
+  5       if inserting then
+  6     insert into emp_check(empid,ename,oldsal,newsal,uname,chk_date)
+  7           values(:new.empno,:new.ename,null,:new.sal,user,sysdate);
+  8      elsif deleting then
+  9     insert into emp_check(empid,ename,oldsal,newsal,uname,chk_date)
+ 10           values(:old.empno,:old.ename,:old.sal,null,user,sysdate);
+ 11      else
+ 12     insert into emp_check(empid,ename,oldsal,newsal,uname,chk_date)
+ 13           values(:old.empno,:old.ename,:old.sal,:new.sal,user,sysdate);
+ 14      end if;
+ 15* end;
+SQL> /
+
+Trigger created.
+
+SQL> insert into emp values(7544,'Atharv','Manager',7698,sysdate,8000,550,40,9000);
+
+1 row created.
+
+SQL> insert into emp values(7545,'Soham','Manager',7698,sysdate,8000,550,40,9000);
+
+1 row created.
+
+
+SQL> select * from emp_check;
+
+     EMPID ENAME                    OLDSAL     NEWSAL UNAME
+---------- -------------------- ---------- ---------- --------------------
+CHK_DATE
+---------
+      7544 Atharv                                8000 DBDA22
+06-OCT-23
+
+      7545 Soham                                 8000 DBDA22
+06-OCT-23

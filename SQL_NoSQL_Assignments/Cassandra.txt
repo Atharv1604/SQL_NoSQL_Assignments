@@ -1,0 +1,254 @@
+1. create a customer table to store following columns, customer id as primary key
+customer id, name, mobile set<int>,email tuple(text,text),purchaseveh map<text,int>,hoobies list<text>
+
+cqlsh:iacsd0923> create table customer (cid int primary key,name text,mobile set<int>,email tuple<text,text>,purchaseveh map<text,int>,hobbies list<text>);
+cqlsh:iacsd0923> desc customer;
+
+CREATE TABLE iacsd0923.customer (
+    cid int PRIMARY KEY,
+    email frozen<tuple<text, text>>,
+    hobbies list<text>,
+    mobile set<int>,
+    name text,
+    purchaseveh map<text, int>
+)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2. insert 5 records with customer id 11,12,13,14,15
+
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(11,'Aditya',{77889999},('adi@123','abc@123'),{'bmw':1,'audi':2},['jujustu']);
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(12,'Atharv',{9970710756},('ath@123','xyz@123'),{'tata':1},[naruto]);
+SyntaxException: line 1:137 no viable alternative at input ']' (...'xyz@123'),{'tata':1},[[naruto]]...)
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(12,'Atharv',{9970710756},('ath@123','xyz@123'),{'tata':1},['naruto']);
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Unable to make int from '9970710756'"
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(12,'Atharv',{99707107},('ath@123','xyz@123'),{'tata':1},['naruto']);
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(13,'Soham',{77995522},('soh@123','pqr@123'),{'mahendra':1},['nagapur']);
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(14,'Shivam',{77995522},('shiv@123','pq@123'),{'RE':1},['trek']);
+cqlsh:iacsd0923> insert into customer (cid,name,mobile,email,purchaseveh,hobbies) values(15,'Shresh',{77995523},('shrey@123','p@123'),{'ktm':1},['Swim']);
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                  | hobbies     | mobile     | name   | purchaseveh
+-----+------------------------+-------------+------------+--------+-----------------------
+  13 | ('soh@123', 'pqr@123') | ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 | ('adi@123', 'abc@123') | ['jujustu'] | {77889999} | Aditya | {'audi': 2, 'bmw': 1}
+  15 | ('shrey@123', 'p@123') |    ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 | ('shiv@123', 'pq@123') |    ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 | ('ath@123', 'xyz@123') |  ['naruto'] | {99707107} | Atharv |           {'tata': 1}
+
+-----------------------------------------------------------------------------------------------------------------
+3. add hoobies design, drawing for custid=12
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... hobbies=hobbies+['designing','drawing'] where cid=12;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                  | hobbies                            | mobile     | name   | purchaseveh
+-----+------------------------+------------------------------------+------------+--------+-----------------------
+  13 | ('soh@123', 'pqr@123') |                        ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 | ('adi@123', 'abc@123') |                        ['jujustu'] | {77889999} | Aditya | {'audi': 2, 'bmw': 1}
+  15 | ('shrey@123', 'p@123') |                           ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 | ('shiv@123', 'pq@123') |                           ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 | ('ath@123', 'xyz@123') | ['naruto', 'designing', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+(5 rows)
+------------------------------------------------------------------------------------------------------------------
+4. remove hoobies design for custid=12
+
+cqlsh:iacsd0923> delete hobbies[1] from customer where cid=12;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                  | hobbies               | mobile     | name   | purchaseveh
+-----+------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soh@123', 'pqr@123') |           ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 | ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} | Aditya | {'audi': 2, 'bmw': 1}
+  15 | ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 | ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 | ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+(5 rows)
+------------------------------------------------------------------------------------------------------------------
+5. update name of customer with id 11
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... name='More' where cid=11;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                  | hobbies               | mobile     | name   | purchaseveh
+-----+------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soh@123', 'pqr@123') |           ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 | ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'audi': 2, 'bmw': 1}
+  15 | ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 | ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 | ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+--------------------------------------------------------------------------------------------------------------------
+6. modify emails of customer 13
+
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... email=('soham@123','efg@123') where cid=13;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+---------------------------------------------------------------------------------------------------------------------
+7. add and delete one of the purchase vehicle
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... purchaseveh=purchaseveh+{'HONDA':2}
+             ... where
+             ... cid=15;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+------------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |        {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More |  {'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh | {'HONDA': 2, 'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |              {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |            {'tata': 1}
+
+(5 rows)
+
+cqlsh:iacsd0923> delete purchaseveh['HONDA'] from customer where cid=15;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+(5 rows)
+-------------------------------------------------------------------------------------------------------------------------
+8. add and delete one of the hobbies for customer 14
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... hobbies=hobbies+['Read']
+             ... where
+             ... cid=13;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soham@123', 'efg@123') |   ['nagapur', 'Read'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+(5 rows)
+
+
+cqlsh:iacsd0923> delete hobbies[1] from customer where cid=13;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+-----------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |       {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |            {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |             {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |           {'tata': 1}
+
+(5 rows)
+---------------------------------------------------------------------------------------------------------------------------
+9.change the quantity of vehicle activa from customer id 15
+
+cqlsh:iacsd0923> update customer
+             ... set
+             ... purchaseveh=purchaseveh+{'Activa':1}
+             ... where cid=11;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+------------------------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |                    {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'Activa': 1, 'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |                         {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |                          {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |                        {'tata': 1}
+
+(5 rows)
+cqlsh:iacsd0923> update customer
+             ... set
+             ... purchaseveh['Activa']=15
+             ... where cid=11;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                    | hobbies               | mobile     | name   | purchaseveh
+-----+--------------------------+-----------------------+------------+--------+-------------------------------------
+  13 | ('soham@123', 'efg@123') |           ['nagapur'] | {77995522} |  Soham |                     {'mahendra': 1}
+  11 |   ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |   More | {'Activa': 15, 'audi': 2, 'bmw': 1}
+  15 |   ('shrey@123', 'p@123') |              ['Swim'] | {77995523} | Shresh |                          {'ktm': 1}
+  14 |   ('shiv@123', 'pq@123') |              ['trek'] | {77995522} | Shivam |                           {'RE': 1}
+  12 |   ('ath@123', 'xyz@123') | ['naruto', 'drawing'] | {99707107} | Atharv |                         {'tata': 1}
+
+(5 rows)
+----------------------------------------------------------------------------------------------------------------------------
+Q2create a batch to add 2 records in customer table, delete record for customer 13 
+and delete only email from customer 11
+and update emails for customer 12
+
+
+cqlsh:iacsd0923> Begin batch
+             ... insert into customer(cid,name,mobile,email,purchaseveh,hobbies) values(16,'Aditya',{77889999},('adi@123','abc@123'),{'audi':2},['jujustu']);
+             ... insert into customer(cid,name,mobile,email,purchaseveh,hobbies) values(17,'Kishore',{99989999},('kisi@123','abc@123'),{'audi':2},['l']);
+             ... delete from customer where cid=13;
+             ... delete email from customer where cid=11;
+             ... update customer set email=('atharv@gmail','abc@123') where cid=12;
+             ... Apply batch;
+cqlsh:iacsd0923> select * from customer;
+
+ cid | email                       | hobbies               | mobile     | name    | purchaseveh
+-----+-----------------------------+-----------------------+------------+---------+-------------------------------------
+  16 |      ('adi@123', 'abc@123') |           ['jujustu'] | {77889999} |  Aditya |                         {'audi': 2}
+  11 |                        null |           ['jujustu'] | {77889999} |    More | {'Activa': 15, 'audi': 2, 'bmw': 1}
+  15 |      ('shrey@123', 'p@123') |              ['Swim'] | {77995523} |  Shresh |                          {'ktm': 1}
+  14 |      ('shiv@123', 'pq@123') |              ['trek'] | {77995522} |  Shivam |                           {'RE': 1}
+  17 |     ('kisi@123', 'abc@123') |                 ['l'] | {99989999} | Kishore |                         {'audi': 2}
+  12 | ('atharv@gmail', 'abc@123') | ['naruto', 'drawing'] | {99707107} |  Atharv |                         {'tata': 1}
+
+(6 rows)
+--------------------------------------------------------------------------------------------------------------------------------
+cqlsh:iacsd0923> create type department (dno int, dname text);
+cqlsh:iacsd0923> Alter type department add dloc text;
+cqlsh:iacsd0923> desc types
+
+a  a1  department  address1
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cqlsh:iacsd0923> create table emp(eid int primary key,ename text,sal int,projects list<text>,dept department);
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(1,'Atharv',30000,['EBIKE','Hospital Management'],{10,'dbda','ground'};
+SyntaxException: line 1:121 mismatched input ';' expecting ')' (...'Hospital Management'],{10,'dbda','ground'}[;])
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(1,'Atharv',30000,['EBIKE','Hospital Management'],{10,'dbda','ground'});
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid set literal for dept of type department"
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(1,'Atharv',30000,['EBIKE','Hospital Management'],{dno:10,dname:'dbda',dloc:'ground'});
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(2,'Soham',35000,['Mech','Management'],{dno:20,dname:'dbda',dloc:'ground'});
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(3,'Aditya',45000,['Flutter','Store app'],{dno:10,dname:'dbda',dloc:'ground'});
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(4,'Shivam',65000,['Kaggle','Store'],{dno:20,dname:'dbda',dloc:'ground'});
+cqlsh:iacsd0923> insert into emp(eid,ename,sal,projects,dept) values(5,'Ajinkya',105000,['Kaggle','Store'],{dno:20,dname:'dbda',dloc:'ground'});
+cqlsh:iacsd0923> select * from emp;
+
+ eid | dept                                     | ename   | projects                         | sal
+-----+------------------------------------------+---------+----------------------------------+--------
+   5 | {dno: 20, dname: 'dbda', dloc: 'ground'} | Ajinkya |              ['Kaggle', 'Store'] | 105000
+   1 | {dno: 10, dname: 'dbda', dloc: 'ground'} |  Atharv | ['EBIKE', 'Hospital Management'] |  30000
+   2 | {dno: 20, dname: 'dbda', dloc: 'ground'} |   Soham |           ['Mech', 'Management'] |  35000
+   4 | {dno: 20, dname: 'dbda', dloc: 'ground'} |  Shivam |              ['Kaggle', 'Store'] |  65000
+   3 | {dno: 10, dname: 'dbda', dloc: 'ground'} |  Aditya |         ['Flutter', 'Store app'] |  45000
+
+(5 rows)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cqlsh:iacsd0923> create index enameidx on emp(ename);
